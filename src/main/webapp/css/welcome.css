@@ -1,0 +1,117 @@
+/* Layout reset */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #f5f6fa;
+    color: #222;
+}
+
+/* Top bar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px;
+    background: #ffffff;
+    border-bottom: 1px solid #e6e8ee;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.brand {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.right { display: flex; align-items: center; gap: 12px; }
+.user { color: #4a4f5a; }
+
+/* Buttons */
+.btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-outline {
+    background: transparent;
+    border: 1px solid #c9ced8;
+}
+.btn-outline:hover {
+    background: #eef2f8;
+}
+
+/* Main */
+.container {
+    max-width: 1000px;
+    margin: 32px auto;
+    padding: 0 18px;
+}
+.title {
+    margin: 0 0 6px;
+    font-size: 28px;
+}
+.subtitle {
+    margin: 0 0 22px;
+    color: #6c717c;
+}
+
+/* Cards grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+@media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+}
+
+/* Card */
+.card {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    text-decoration: none;
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid #e6e8ee;
+    box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+    transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    color: inherit;
+}
+.card:hover {
+    transform: translateY(-2px);
+    border-color: #cdd4df;
+    box-shadow: 0 8px 26px rgba(16,24,40,0.10);
+}
+.card .emoji {
+    font-size: 34px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.card h2 {
+    margin: 0;
+    font-size: 20px;
+}
+.card p {
+    margin: 4px 0 10px;
+    color: #6c717c;
+}
+.card .cta {
+    margin-top: auto;
+    font-weight: 700;
+    color: #2e86de;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    color: #8b90a0;
+    padding: 24px 0 40px;
+}
