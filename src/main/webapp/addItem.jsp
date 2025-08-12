@@ -6,10 +6,17 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manage_items.css">
 </head>
 <body>
+
+<!-- Back to Manage Items -->
+<p style="margin:20px;">
+    <a class="btn" href="<%=request.getContextPath()%>/manageItem.jsp">← Back to Manage Items</a>
+</p>
+
 <h2>Add New Item</h2>
 <% String err = (String) request.getAttribute("error"); if (err!=null){ %>
 <div class="error"><%=err%></div>
 <% } %>
+
 <form method="post" action="<%=request.getContextPath()%>/items/add">
     <label>Name</label><input name="name" required>
     <label>Description</label><textarea name="description" required></textarea>

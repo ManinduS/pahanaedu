@@ -12,26 +12,65 @@
     <welcome-file>login.jsp</welcome-file>
   </welcome-file-list>
 
-  <!-- Login servlet -->
+  <!-- Auth -->
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>control.LoginServlet</servlet-class>
   </servlet>
-
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
 
-  <!-- Optional: Logout servlet -->
   <servlet>
     <servlet-name>LogoutServlet</servlet-name>
     <servlet-class>control.LogoutServlet</servlet-class>
   </servlet>
-
   <servlet-mapping>
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
+
+  <!-- Items -->
+  <servlet>
+    <servlet-name>AddItemServlet</servlet-name>
+    <servlet-class>control.AddItemServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddItemServlet</servlet-name>
+    <url-pattern>/items/add</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ViewItemsServlet</servlet-name>
+    <servlet-class>control.ViewItemsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ViewItemsServlet</servlet-name>
+    <url-pattern>/items</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>EditItemServlet</servlet-name>
+    <servlet-class>control.EditItemServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EditItemServlet</servlet-name>
+    <url-pattern>/items/edit</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>DeleteItemServlet</servlet-name>
+    <servlet-class>control.DeleteItemServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteItemServlet</servlet-name>
+    <url-pattern>/items/delete</url-pattern>
+  </servlet-mapping>
+
+  <!-- Optional: session timeout -->
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
 
 </web-app>
