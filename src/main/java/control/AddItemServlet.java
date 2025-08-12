@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import java.io.IOException;          // ✅ add this
 import java.math.BigDecimal;
 
 @WebServlet(name = "AddItemServlet", urlPatterns = {"/items/add"})
@@ -18,13 +18,13 @@ public class AddItemServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // Require login
+
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
-        // Open the add form
+
         req.getRequestDispatcher("/addItem.jsp").forward(req, resp);
     }
 
@@ -32,7 +32,6 @@ public class AddItemServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Require login
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
@@ -46,7 +45,6 @@ public class AddItemServlet extends HttpServlet {
         String priceStr = trim(req.getParameter("price"));
         String qtyStr = trim(req.getParameter("quantity"));
 
-        // Basic validation
         if (name.isEmpty() || description.isEmpty() || priceStr.isEmpty() || qtyStr.isEmpty()) {
             setErrorAndBack(req, resp, "Please fill all fields.");
             return;
@@ -64,7 +62,14 @@ public class AddItemServlet extends HttpServlet {
             Item item = new Item(name, description, price, quantity);
             new ItemDAO().insert(item);
 
-            resp.sendRedirect(req.getContextPath() + "/items"); // go to list
+            // Stay on the form with success message
+            req.setAttribute("success", "Item added successfully.");
+            req.setAttribute("name", "");
+            req.setAttribute("description", "");
+            req.setAttribute("price", "");
+            req.setAttribute("quantity", "");
+            req.getRequestDispatcher("/addItem.jsp").forward(req, resp);
+
         } catch (NumberFormatException nfe) {
             setErrorAndBack(req, resp, "Enter valid numbers for price and quantity.");
         } catch (Exception e) {
@@ -75,7 +80,6 @@ public class AddItemServlet extends HttpServlet {
     private void setErrorAndBack(HttpServletRequest req, HttpServletResponse resp, String msg)
             throws ServletException, IOException {
         req.setAttribute("error", msg);
-        // keep typed values so the user doesn't retype
         req.setAttribute("name", trim(req.getParameter("name")));
         req.setAttribute("description", trim(req.getParameter("description")));
         req.setAttribute("price", trim(req.getParameter("price")));

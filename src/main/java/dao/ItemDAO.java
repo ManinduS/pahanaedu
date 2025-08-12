@@ -2,6 +2,7 @@ package dao;
 
 import model.Item;
 import util.DBUtil;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,54 @@ public class ItemDAO {
         }
     }
 
+    /** Backward-compatible: search only, no stock filter */
     public List<Item> findAll(String q) throws Exception {
-        String base = "SELECT * FROM items";
-        String sql = (q == null || q.isEmpty()) ? base : base + " WHERE name LIKE ? OR description LIKE ? ORDER BY id DESC";
-        try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            if (sql.contains("LIKE")) {
-                String like = "%" + q + "%";
-                ps.setString(1, like); ps.setString(2, like);
+        return findAll(q, "all");
+    }
+
+    /** Search + stock filter: status = all | in | low | out */
+    public List<Item> findAll(String q, String status) throws Exception {
+        StringBuilder sql = new StringBuilder("SELECT * FROM items");
+        List<String> where = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        // Search by name or description
+        if (q != null && !q.trim().isEmpty()) {
+            where.add("(name LIKE ? OR description LIKE ?)");
+            String like = "%" + q.trim() + "%";
+            params.add(like);
+            params.add(like);
+        }
+
+        // Stock filter
+        if (status != null) {
+            switch (status.toLowerCase()) {
+                case "in":
+                    where.add("quantity > 0");
+                    break;
+                case "low":
+                    where.add("quantity <= 5 AND quantity > 0");
+                    break;
+                case "out":
+                    where.add("quantity = 0");
+                    break;
+                // "all" or anything else -> no extra condition
             }
+        }
+
+        if (!where.isEmpty()) {
+            sql.append(" WHERE ").append(String.join(" AND ", where));
+        }
+        sql.append(" ORDER BY id DESC");
+
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql.toString())) {
+
+            int idx = 1;
+            for (Object p : params) {
+                ps.setObject(idx++, p);
+            }
+
             try (ResultSet rs = ps.executeQuery()) {
                 List<Item> list = new ArrayList<>();
                 while (rs.next()) {

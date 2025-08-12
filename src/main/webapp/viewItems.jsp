@@ -2,6 +2,9 @@
 <%@ page import="java.util.*, model.Item" %>
 <%
     List<Item> items = (List<Item>) request.getAttribute("items");
+    String q = request.getParameter("q");
+    String status = request.getParameter("status");
+    if (status == null) status = "all"; // all | in | low | out
 %>
 <!DOCTYPE html>
 <html>
@@ -20,30 +23,38 @@
 
 <form method="get" action="<%=request.getContextPath()%>/items" class="search">
     <input type="text" name="q" placeholder="Search by name/description"
-           value="<%= request.getParameter("q")==null ? "" : request.getParameter("q") %>">
+           value="<%= q == null ? "" : q %>">
+
+    <!-- Stock filter -->
+    <select name="status" title="Filter by stock">
+        <option value="all" <%= "all".equals(status) ? "selected" : "" %>>All</option>
+        <option value="in"  <%= "in".equals(status)  ? "selected" : "" %>>In stock (&gt; 0)</option>
+        <option value="low" <%= "low".equals(status) ? "selected" : "" %>>Low stock (&le; 5)</option>
+        <option value="out" <%= "out".equals(status) ? "selected" : "" %>>Out of stock (= 0)</option>
+    </select>
+
     <button type="submit">Search</button>
-    <a class="btn" href="<%=request.getContextPath()%>/addItem.jsp">Add Item</a>
+    <a class="btn" href="<%=request.getContextPath()%>/items">Clear</a>
 </form>
 
 <table>
     <thead>
-    <tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th><th>Qty</th><th>Actions</th></tr>
+    <tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th><th>Qty</th></tr>
     </thead>
     <tbody>
-    <% if (items != null) for (Item it : items) { %>
+    <% if (items != null && !items.isEmpty()) {
+        for (Item it : items) { %>
     <tr>
-        <td><%=it.getId()%></td>
-        <td><%=it.getName()%></td>
-        <td><%=it.getDescription()%></td>
-        <td><%=it.getPrice()%></td>
-        <td><%=it.getQuantity()%></td>
-        <td class="actions">
-            <a class="link" href="<%=request.getContextPath()%>/items/edit?id=<%=it.getId()%>">Edit</a>
-            <form method="post" action="<%=request.getContextPath()%>/items/delete" style="display:inline">
-                <input type="hidden" name="id" value="<%=it.getId()%>">
-                <button type="submit" onclick="return confirm('Delete this item?')">Delete</button>
-            </form>
-        </td>
+        <td><%= it.getId() %></td>
+        <td><%= it.getName() %></td>
+        <td><%= it.getDescription() %></td>
+        <td><%= it.getPrice() %></td>
+        <td><%= it.getQuantity() %></td>
+    </tr>
+    <%   }
+    } else { %>
+    <tr>
+        <td colspan="5" style="text-align:center;color:#777;">No items found.</td>
     </tr>
     <% } %>
     </tbody>

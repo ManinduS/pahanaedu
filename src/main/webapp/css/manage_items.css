@@ -17,3 +17,11 @@ thead { background:#f3f6fb; }
 .actions { white-space:nowrap; }
 .link { margin-right:8px; }
 .error { background:#ffecec; color:#b10010; padding:10px; border-radius:8px; margin-bottom:10px; }
+.success {
+    background: #e7f9ed;
+    color: #186a3b;
+    padding: 10px;
+    border: 1px solid #b7e4c7;
+    border-radius: 8px;
+    margin: 10px 20px;
+}
