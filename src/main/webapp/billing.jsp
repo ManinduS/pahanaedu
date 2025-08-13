@@ -1,9 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="model.Cart,model.CartItem" %>
+<%@ page import="model.Cart,model.CartItem,model.Customer" %>
 <%
     Cart cart = (Cart) session.getAttribute("cart");
     if (cart == null) { cart = new model.Cart(); session.setAttribute("cart", cart); }
     String ctx = request.getContextPath();
+    Customer sel = (Customer) session.getAttribute("billingCustomer");
 %>
 <!DOCTYPE html>
 <html>
@@ -18,34 +19,82 @@
         <h1>PahanaEdu — Billing</h1>
     </div>
 
-    <!-- Optional Customer Details -->
-    <form class="customer" method="post" action="billing">
-        <input type="hidden" name="action" value="noop">
-        <div>
-            <label>Customer Name (optional)</label>
-            <input name="cust_name" form="checkoutForm" placeholder="e.g. Nimal Perera">
-        </div>
-        <div>
-            <label>Phone</label>
-            <input name="cust_phone" form="checkoutForm" placeholder="07XXXXXXXX">
-        </div>
-        <div>
-            <label>Address 1</label>
-            <input name="cust_addr1" form="checkoutForm" placeholder="Line 1">
-        </div>
-        <div>
-            <label>Address 2</label>
-            <input name="cust_addr2" form="checkoutForm" placeholder="Line 2">
-        </div>
-    </form>
+    <!-- Customer selection (picked from customer section; no manual typing) -->
+    <div class="results">
+        <h3>Customer</h3>
 
-    <!-- Search -->
+        <% if (request.getParameter("needCustomer") != null) { %>
+        <div style="color:#b00;margin-bottom:8px">Please select a customer before checkout.</div>
+        <% } %>
+
+        <% if (sel != null) { %>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+                <strong>
+                    <%= sel.getName() %>
+                    <%= (sel.getSurname()==null ? "" : " " + sel.getSurname()) %>
+                </strong><br>
+                <small><%= sel.getPhone()==null?"":sel.getPhone() %></small><br>
+                <small>
+                    <%= sel.getAddress1()==null?"":sel.getAddress1() %>
+                    <%= sel.getAddress2()==null?"":" | "+sel.getAddress2() %>
+                </small>
+            </div>
+            <form method="post" action="billing" class="inline">
+                <input type="hidden" name="action" value="clearCustomer">
+                <button type="submit" class="danger">Change</button>
+            </form>
+        </div>
+        <% } else { %>
+        <!-- Quick customer search -->
+        <form class="search" method="get" action="billing">
+            <input type="text" name="custq" placeholder="Search customer by name or phone..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <%
+            java.util.List<model.Customer> custResults =
+                    (java.util.List<model.Customer>) request.getAttribute("custResults");
+            if (custResults != null) {
+        %>
+        <table>
+            <tr><th>Name</th><th>Phone</th><th>Address</th><th style="width:140px"></th></tr>
+            <% for (model.Customer c : custResults) { %>
+            <tr>
+                <td><%= c.getName() %> <%= c.getSurname()==null?"":c.getSurname() %></td>
+                <td><%= c.getPhone()==null?"":c.getPhone() %></td>
+                <td>
+                    <%= c.getAddress1()==null?"":c.getAddress1() %>
+                    <%= c.getAddress2()==null?"":" | "+c.getAddress2() %>
+                </td>
+                <td>
+                    <form method="post" action="billing" class="inline">
+                        <input type="hidden" name="action" value="selectCustomer">
+                        <input type="hidden" name="id" value="<%= c.getId() %>">
+                        <button type="submit">Select</button>
+                    </form>
+                </td>
+            </tr>
+            <% } %>
+        </table>
+        <% } %>
+
+        <p style="margin-top:8px">
+            Tip: From your customer list, link to
+            <code><%=ctx%>/billing?customerId=&lt;id&gt;</code>
+            to pre-select a customer.
+        </p>
+        <% } %>
+    </div>
+
+    <!-- Item Search -->
     <form class="search" method="get" action="billing">
-        <input type="text" name="q" placeholder="Search items by name..." value="<%= request.getParameter("q")==null?"":request.getParameter("q") %>" required>
+        <input type="text" name="q" placeholder="Search items by name..."
+               value="<%= request.getParameter("q")==null?"":request.getParameter("q") %>" required>
         <button type="submit">Search</button>
     </form>
 
-    <!-- Results -->
+    <!-- Item Results -->
     <%
         java.util.List<model.Item> results = (java.util.List<model.Item>) request.getAttribute("results");
         if (results != null) {
@@ -132,7 +181,7 @@
 
         <form id="checkoutForm" method="post" action="billing" class="checkout">
             <input type="hidden" name="action" value="checkout">
-            <button type="submit" <% if(cart.isEmpty()){ %>disabled<% } %>>Print / Download Bill</button>
+            <button type="submit" <% if(cart.isEmpty()){ %>disabled<% } %>>Save &amp; Print</button>
         </form>
     </div>
 </div>
