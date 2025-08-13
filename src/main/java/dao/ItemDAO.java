@@ -32,10 +32,10 @@ public class ItemDAO {
         List<String> where = new ArrayList<>();
         List<Object> params = new ArrayList<>();
 
-        // Search by name or description
+        // Search by name or description (case-insensitive)
         if (q != null && !q.trim().isEmpty()) {
-            where.add("(name LIKE ? OR description LIKE ?)");
-            String like = "%" + q.trim() + "%";
+            where.add("(LOWER(name) LIKE ? OR LOWER(description) LIKE ?)");
+            String like = "%" + q.trim().toLowerCase() + "%";
             params.add(like);
             params.add(like);
         }
@@ -65,15 +65,11 @@ public class ItemDAO {
              PreparedStatement ps = c.prepareStatement(sql.toString())) {
 
             int idx = 1;
-            for (Object p : params) {
-                ps.setObject(idx++, p);
-            }
+            for (Object p : params) ps.setObject(idx++, p);
 
             try (ResultSet rs = ps.executeQuery()) {
                 List<Item> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(map(rs));
-                }
+                while (rs.next()) list.add(map(rs));
                 return list;
             }
         }
@@ -111,6 +107,39 @@ public class ItemDAO {
             ps.executeUpdate();
         }
     }
+
+    /* ======================
+       Added for Billing search
+       ====================== */
+
+    /** Case-insensitive search by name, default limit 50 (for billing search box). */
+    public List<Item> searchByName(String q) throws Exception {
+        return searchByName(q, 50);
+    }
+
+    /** Case-insensitive search by name with custom limit. */
+    public List<Item> searchByName(String q, int limit) throws Exception {
+        List<Item> list = new ArrayList<>();
+        if (q == null || q.trim().isEmpty()) return list;
+
+        String sql = "SELECT id, name, description, price, quantity " +
+                "FROM items " +
+                "WHERE LOWER(name) LIKE ? " +
+                "ORDER BY name ASC " +
+                "LIMIT ?";
+
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, "%" + q.trim().toLowerCase() + "%");
+            ps.setInt(2, Math.max(1, limit));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
+
+    /* ============== */
 
     private Item map(ResultSet rs) throws SQLException {
         return new Item(
