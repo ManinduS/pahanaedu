@@ -26,13 +26,17 @@ public class ViewItemsServlet extends HttpServlet {
 
         String q = trim(req.getParameter("q"));
         String status = trim(req.getParameter("status"));
-        if (status.isEmpty()) status = "all"; // default
+        if (status.isEmpty()) status = "all"; // default stock filter
+
+        // Manage mode (edit/delete visible) when ?mode=manage
+        boolean manage = "manage".equalsIgnoreCase(req.getParameter("mode"));
+        req.setAttribute("manage", manage);
 
         try {
             // DAO method that handles search + stock filter
             req.setAttribute("items", new ItemDAO().findAll(q, status));
 
-            // keep current filters for the JSP if you want to read as attributes
+            // keep filters for the JSP
             req.setAttribute("q", q);
             req.setAttribute("status", status);
 
