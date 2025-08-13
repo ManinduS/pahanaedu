@@ -10,13 +10,12 @@
   <name>Pahana Edu Maven Webapp</name>
 
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    <!-- Servlet API (provided by Tomcat) -->
+    <!-- Servlet API (provided by Tomcat 9.x) -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -38,7 +37,7 @@
       <version>8.4.0</version>
     </dependency>
 
-    <!-- (Optional) BCrypt if you later hash passwords -->
+    <!-- (Optional) BCrypt for password hashing -->
     <!--
     <dependency>
       <groupId>org.mindrot</groupId>
@@ -47,7 +46,7 @@
     </dependency>
     -->
 
-    <!-- Test -->
+    <!-- Tests -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -63,12 +62,26 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <release>11</release>
+          <release>${maven.compiler.release}</release>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.4.0</version>
+        <configuration>
+          <!-- No web.xml required for Servlet 3+, but you have one; both are fine -->
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+
+      <!-- Ensure resource files use UTF-8 -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
       </plugin>
     </plugins>
   </build>

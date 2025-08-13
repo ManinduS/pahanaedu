@@ -30,7 +30,7 @@
 
     <section class="grid">
         <!-- Customer -->
-        <a class="card" href="<%=request.getContextPath()%>/editCustomer.jsp">
+        <a class="card" href="<%=request.getContextPath()%>/customer.jsp">
             <div class="emoji">👥</div>
             <h2>Customer</h2>
             <p>Add, view, and edit customers.</p>
