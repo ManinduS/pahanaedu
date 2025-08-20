@@ -52,6 +52,14 @@
             <p>Search products, create a bill, and print.</p>
             <span class="cta">Open</span>
         </a>
+
+        <!-- Help -->
+        <a class="card" href="<%=request.getContextPath()%>/help.jsp">
+            <div class="emoji">❓</div>
+            <h2>Help</h2>
+            <p>View system usage guidelines for new users.</p>
+            <span class="cta">Open</span>
+        </a>
     </section>
 </main>
 
